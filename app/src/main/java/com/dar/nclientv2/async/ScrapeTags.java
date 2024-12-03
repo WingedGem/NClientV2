@@ -26,7 +26,7 @@ import okhttp3.ResponseBody;
 
 public class ScrapeTags extends JobIntentService {
     private static final int DAYS_UNTIL_SCRAPE = 7;
-    private static final String DATA_FOLDER = "https://raw.githubusercontent.com/Dar9586/NClientV2/master/data/";
+    private static final String DATA_FOLDER = "https://raw.githubusercontent.com/WingedGem/NClientV2/master/data/";
     private static final String TAGS = DATA_FOLDER + "tags.json";
     private static final String VERSION = DATA_FOLDER + "tagsVersion";
 
@@ -61,23 +61,26 @@ public class ScrapeTags extends JobIntentService {
         Date nowTime = new Date();
         Date lastTime = new Date(preferences.getLong("lastSync", nowTime.getTime()));
         int lastVersion = preferences.getInt("lastTagsVersion", -1), newVersion = -1;
-        if (!enoughDayPassed(nowTime, lastTime)) return;
+        if (!enoughDayPassed(nowTime, lastTime))
+            return;
 
         LogUtility.d("Scraping tags");
         try {
             newVersion = getNewVersionCode();
-            if (lastVersion > -1 && lastVersion >= newVersion) return;
+            if (lastVersion > -1 && lastVersion >= newVersion)
+                return;
             List<Tag> tags = Queries.TagTable.getAllFiltered();
             fetchTags();
-            for (Tag t : tags) Queries.TagTable.updateStatus(t.getId(), t.getStatus());
+            for (Tag t : tags)
+                Queries.TagTable.updateStatus(t.getId(), t.getStatus());
         } catch (IOException e) {
             e.printStackTrace();
         }
         LogUtility.d("End scraping");
         preferences.edit()
-            .putLong("lastSync", nowTime.getTime())
-            .putInt("lastTagsVersion", newVersion)
-            .apply();
+                .putLong("lastSync", nowTime.getTime())
+                .putInt("lastTagsVersion", newVersion)
+                .apply();
     }
 
     private void fetchTags() throws IOException {
@@ -108,8 +111,9 @@ public class ScrapeTags extends JobIntentService {
     }
 
     private boolean enoughDayPassed(Date nowTime, Date lastTime) {
-        //first start or never completed
-        if (nowTime.getTime() == lastTime.getTime()) return true;
+        // first start or never completed
+        if (nowTime.getTime() == lastTime.getTime())
+            return true;
         int daysBetween = 0;
         Calendar now = Calendar.getInstance(), last = Calendar.getInstance();
         now.setTime(nowTime);

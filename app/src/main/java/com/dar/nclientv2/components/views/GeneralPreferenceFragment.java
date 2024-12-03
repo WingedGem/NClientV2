@@ -173,7 +173,7 @@ public class GeneralPreferenceFragment extends PreferenceFragmentCompat {
             return true;
         });
         findPreference(getString(R.string.key_enable_beta)).setOnPreferenceChangeListener((preference, newValue) -> {
-            //Instant update to allow search for updates
+            // Instant update to allow search for updates
             Global.setEnableBeta((Boolean) newValue);
             return true;
         });
@@ -193,11 +193,12 @@ public class GeneralPreferenceFragment extends PreferenceFragmentCompat {
         initStoragePaths(findPreference(getString(R.string.key_save_path)));
         double cacheSize = Global.recursiveSize(act.getCacheDir()) / ((double) (1 << 20));
         findPreference(getString(R.string.key_save_path)).setOnPreferenceChangeListener((preference, newValue) -> {
-            if (!newValue.equals(getString(R.string.custom_path))) return true;
+            if (!newValue.equals(getString(R.string.custom_path)))
+                return true;
             manageCustomPath();
             return false;
         });
-        //clear cache if pressed
+        // clear cache if pressed
         findPreference(getString(R.string.key_cache)).setSummary(getString(R.string.cache_size_formatted, cacheSize));
         findPreference(getString(R.string.key_cookie)).setOnPreferenceClickListener(preference -> {
             Login.clearCookies();
@@ -212,7 +213,8 @@ public class GeneralPreferenceFragment extends PreferenceFragmentCompat {
                 act.runOnUiThread(() -> {
                     Toast.makeText(act, act.getString(R.string.cache_cleared), Toast.LENGTH_SHORT).show();
                     double cSize = Global.recursiveSize(act.getCacheDir()) / ((double) (2 << 20));
-                    findPreference(getString(R.string.key_cache)).setSummary(getString(R.string.cache_size_formatted, cSize));
+                    findPreference(getString(R.string.key_cache))
+                            .setSummary(getString(R.string.cache_size_formatted, cSize));
                 });
 
             }).setNegativeButton(R.string.no, null).setCancelable(true);
@@ -225,12 +227,12 @@ public class GeneralPreferenceFragment extends PreferenceFragmentCompat {
             return true;
         });
         findPreference("bug").setOnPreferenceClickListener(preference -> {
-            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Dar9586/NClientV2/issues/new"));
+            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/WingedGem/NClientV2/issues/new"));
             startActivity(i);
             return true;
         });
         findPreference("donate").setOnPreferenceClickListener(preference -> {
-            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Dar9586/NClientV2#donation"));
+            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/WingedGem/NClientV2#donation"));
             startActivity(i);
             return true;
         });
@@ -253,9 +255,8 @@ public class GeneralPreferenceFragment extends PreferenceFragmentCompat {
 
         ListPreference mirror = findPreference(getString(R.string.key_site_mirror));
         mirror.setSummary(
-            act.getSharedPreferences("Settings", Context.MODE_PRIVATE)
-                .getString(getString(R.string.key_site_mirror), Utility.ORIGINAL_URL)
-        );
+                act.getSharedPreferences("Settings", Context.MODE_PRIVATE)
+                        .getString(getString(R.string.key_site_mirror), Utility.ORIGINAL_URL));
         mirror.setOnPreferenceChangeListener((preference, newValue) -> {
             preference.setSummary(newValue.toString());
             return true;
@@ -269,21 +270,23 @@ public class GeneralPreferenceFragment extends PreferenceFragmentCompat {
         }
         final String key = getString(R.string.key_save_path);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(act);
-        AppCompatAutoCompleteTextView edit = (AppCompatAutoCompleteTextView) View.inflate(act, R.layout.autocomplete_entry, null);
+        AppCompatAutoCompleteTextView edit = (AppCompatAutoCompleteTextView) View.inflate(act,
+                R.layout.autocomplete_entry, null);
         edit.setHint(R.string.insert_path);
         builder.setView(edit);
         builder.setTitle(R.string.insert_path);
         builder.setPositiveButton(R.string.ok, (dialog, which) -> {
-            act.getSharedPreferences("Settings", Context.MODE_PRIVATE).edit().putString(key, edit.getText().toString()).apply();
+            act.getSharedPreferences("Settings", Context.MODE_PRIVATE).edit().putString(key, edit.getText().toString())
+                    .apply();
             findPreference(key).setSummary(edit.getText().toString());
         }).setNegativeButton(R.string.cancel, null).show();
     }
 
     private void changeLauncher(PackageManager pm, ComponentName name, boolean enabled) {
-        int enableState = enabled ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+        int enableState = enabled ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
         pm.setComponentEnabledSetting(name, enableState, PackageManager.DONT_KILL_APP);
     }
-
 
     private void initStoragePaths(ListPreference storagePreference) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT || !Global.hasStoragePermission(act)) {
@@ -300,9 +303,8 @@ public class GeneralPreferenceFragment extends PreferenceFragmentCompat {
         storagePreference.setEntries(strings.toArray(new CharSequence[0]));
         storagePreference.setEntryValues(strings.toArray(new CharSequence[0]));
         storagePreference.setSummary(
-            act.getSharedPreferences("Settings", Context.MODE_PRIVATE)
-                .getString(getString(R.string.key_save_path), Global.MAINFOLDER.getParent())
-        );
+                act.getSharedPreferences("Settings", Context.MODE_PRIVATE)
+                        .getString(getString(R.string.key_save_path), Global.MAINFOLDER.getParent()));
         storagePreference.setOnPreferenceChangeListener((preference, newValue) -> {
             preference.setSummary(newValue.toString());
             return true;
@@ -310,7 +312,7 @@ public class GeneralPreferenceFragment extends PreferenceFragmentCompat {
     }
 
     private String getDataSettings(Context context) throws IOException {
-        String[] names = new String[]{"Settings", "ScrapedTags"};
+        String[] names = new String[] { "Settings", "ScrapedTags" };
         StringWriter sw = new StringWriter();
         JsonWriter writer = new JsonWriter(sw);
         writer.setIndent("\t");
@@ -340,10 +342,14 @@ public class GeneralPreferenceFragment extends PreferenceFragmentCompat {
 
     private void writeEntry(JsonWriter writer, Map.Entry<String, ?> entry) throws IOException {
         writer.name(entry.getKey());
-        if (entry.getValue() instanceof Integer) writer.value((Integer) entry.getValue());
-        else if (entry.getValue() instanceof Boolean) writer.value((Boolean) entry.getValue());
-        else if (entry.getValue() instanceof String) writer.value((String) entry.getValue());
-        else if (entry.getValue() instanceof Long) writer.value((Long) entry.getValue());
+        if (entry.getValue() instanceof Integer)
+            writer.value((Integer) entry.getValue());
+        else if (entry.getValue() instanceof Boolean)
+            writer.value((Boolean) entry.getValue());
+        else if (entry.getValue() instanceof String)
+            writer.value((String) entry.getValue());
+        else if (entry.getValue() instanceof Long)
+            writer.value((Long) entry.getValue());
     }
 
     @Override

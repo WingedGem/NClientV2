@@ -42,10 +42,10 @@ import com.dar.nclientv2.settings.Global;
 import com.dar.nclientv2.settings.Login;
 import com.dar.nclientv2.utility.LogUtility;
 import com.dar.nclientv2.utility.Utility;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
-import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,7 +74,7 @@ public class GalleryActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Global.initActivity(this);
+        // Global.initActivity(this);
         setContentView(R.layout.activity_gallery);
         if (Global.isLockScreen())
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -90,32 +90,34 @@ public class GalleryActivity extends BaseActivity {
             finish();
             return;
         }
-        if (gal != null) this.gallery = gal;
+        if (gal != null)
+            this.gallery = gal;
         if (gallery.getType() != GenericGallery.Type.LOCAL) {
             Queries.HistoryTable.addGallery(((Gallery) gallery).toSimpleGallery());
         }
         LogUtility.d("" + gallery);
-        if (Global.useRtl()) recycler.setRotationY(180);
+        if (Global.useRtl())
+            recycler.setRotationY(180);
         isLocal = getIntent().getBooleanExtra(getPackageName() + ".ISLOCAL", false);
         zoom = getIntent().getIntExtra(getPackageName() + ".ZOOM", 0);
         refresher.setEnabled(false);
         recycler.setLayoutManager(new CustomGridLayoutManager(this, Global.getColumnCount()));
 
-        loadGallery(gallery, zoom);//if already has gallery
+        loadGallery(gallery, zoom);// if already has gallery
     }
 
     private boolean tryLoadFromURL() {
         Uri data = getIntent().getData();
-        if (data != null && data.getPathSegments().size() >= 2) {//if using an URL
+        if (data != null && data.getPathSegments().size() >= 2) {// if using an URL
             List<String> params = data.getPathSegments();
             LogUtility.d(params.size() + ": " + params);
             int id;
-            try {//if not an id return
+            try {// if not an id return
                 id = Integer.parseInt(params.get(1));
             } catch (NumberFormatException ignore) {
                 return false;
             }
-            if (params.size() > 2) {//check if it has a specific page
+            if (params.size() > 2) {// check if it has a specific page
                 try {
                     zoom = Integer.parseInt(params.get(2));
                 } catch (NumberFormatException e) {
@@ -171,12 +173,14 @@ public class GalleryActivity extends BaseActivity {
 
     private void checkBookmark() {
         int page = Queries.ResumeTable.pageFromId(gallery.getId());
-        if (page < 0) return;
+        if (page < 0)
+            return;
         Snackbar snack = Snackbar.make(toolbar, getString(R.string.resume_from_page, page), Snackbar.LENGTH_LONG);
-        //Should be already compensated
+        // Should be already compensated
         snack.setAction(R.string.resume, v -> new Thread(() -> {
             runOnUiThread(() -> recycler.scrollToPosition(page));
-            if (Global.getColumnCount() != 1) return;
+            if (Global.getColumnCount() != 1)
+                return;
             Utility.threadSleep(500);
             runOnUiThread(() -> recycler.scrollToPosition(page));
         }).start());
@@ -187,12 +191,13 @@ public class GalleryActivity extends BaseActivity {
         CollapsingToolbarLayout collapsing = findViewById(R.id.collapsing);
         ActionBar actionBar = getSupportActionBar();
         final String title = gallery.getTitle();
-        if (collapsing == null || actionBar == null) return;
+        if (collapsing == null || actionBar == null)
+            return;
         View.OnLongClickListener listener = v -> {
             CopyToClipboardActivity.copyTextToClipboard(GalleryActivity.this, title);
             GalleryActivity.this.runOnUiThread(
-                () -> Toast.makeText(GalleryActivity.this, R.string.title_copied_to_clipboard, Toast.LENGTH_SHORT).show()
-            );
+                    () -> Toast.makeText(GalleryActivity.this, R.string.title_copied_to_clipboard, Toast.LENGTH_SHORT)
+                            .show());
             return true;
         };
 
@@ -219,7 +224,6 @@ public class GalleryActivity extends BaseActivity {
         return 0;
     }
 
-
     public void initFavoriteIcon(Menu menu) {
         boolean onlineFavorite = !isLocal && ((Gallery) gallery).isOnlineFavorite();
         boolean unknown = getIntent().getBooleanExtra(getPackageName() + ".UNKNOWN", false);
@@ -227,9 +231,12 @@ public class GalleryActivity extends BaseActivity {
 
         item.setIcon(onlineFavorite ? R.drawable.ic_star : R.drawable.ic_star_border);
 
-        if (unknown) item.setTitle(R.string.toggle_online_favorite);
-        else if (onlineFavorite) item.setTitle(R.string.remove_from_online_favorites);
-        else item.setTitle(R.string.add_to_online_favorite);
+        if (unknown)
+            item.setTitle(R.string.toggle_online_favorite);
+        else if (onlineFavorite)
+            item.setTitle(R.string.remove_from_online_favorites);
+        else
+            item.setTitle(R.string.add_to_online_favorite);
     }
 
     @Override
@@ -237,7 +244,8 @@ public class GalleryActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.gallery, menu);
         isLocalFavorite = Favorites.isFavorite(gallery);
 
-        menu.findItem(R.id.favorite_manager).setIcon(isLocalFavorite ? R.drawable.ic_favorite : R.drawable.ic_favorite_border);
+        menu.findItem(R.id.favorite_manager)
+                .setIcon(isLocalFavorite ? R.drawable.ic_favorite : R.drawable.ic_favorite_border);
         menuItemsVisible(menu);
         initFavoriteIcon(menu);
         Utility.tintMenu(menu);
@@ -264,7 +272,8 @@ public class GalleryActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         updateColumnCount(false);
-        if (isLocal) supportInvalidateOptionsMenu();
+        if (isLocal)
+            supportInvalidateOptionsMenu();
     }
 
     @Override
@@ -275,12 +284,18 @@ public class GalleryActivity extends BaseActivity {
                 new RangeSelector(this, (Gallery) gallery).show();
             else
                 requestStorage();
-        } else if (id == R.id.add_online_gallery) addToFavorite(item);
-        else if (id == R.id.change_view) updateColumnCount(true);
-        else if (id == R.id.download_torrent) downloadTorrent();
-        else if (id == R.id.load_internet) toInternet();
-        else if (id == R.id.manage_status) updateStatus();
-        else if (id == R.id.share) Global.shareGallery(this, gallery);
+        } else if (id == R.id.add_online_gallery)
+            addToFavorite(item);
+        else if (id == R.id.change_view)
+            updateColumnCount(true);
+        else if (id == R.id.download_torrent)
+            downloadTorrent();
+        else if (id == R.id.load_internet)
+            toInternet();
+        else if (id == R.id.manage_status)
+            updateStatus();
+        else if (id == R.id.share)
+            Global.shareGallery(this, gallery);
         else if (id == R.id.comments) {
             Intent i = new Intent(this, CommentActivity.class);
             i.putExtra(getPackageName() + ".GALLERYID", gallery.getId());
@@ -289,7 +304,8 @@ public class GalleryActivity extends BaseActivity {
             recycler.smoothScrollToPosition(recycler.getAdapter().getItemCount());
         } else if (id == R.id.favorite_manager) {
             if (isLocalFavorite) {
-                if (Favorites.removeFavorite(gallery)) isLocalFavorite = !isLocalFavorite;
+                if (Favorites.removeFavorite(gallery))
+                    isLocalFavorite = !isLocalFavorite;
             } else if (Favorites.addFavorite((Gallery) gallery)) {
                 isLocalFavorite = !isLocalFavorite;
             }
@@ -304,7 +320,7 @@ public class GalleryActivity extends BaseActivity {
     }
 
     private void downloadTorrent() {
-        if(!Global.hasStoragePermission(this)){
+        if (!Global.hasStoragePermission(this)) {
             return;
         }
 
@@ -313,43 +329,43 @@ public class GalleryActivity extends BaseActivity {
 
         new AuthRequest(referer, url, new Callback() {
             @Override
-            public void onFailure(@NonNull Call call,@NonNull  IOException e) {
-                GalleryActivity.this.runOnUiThread(() ->
-                    Toast.makeText(GalleryActivity.this, R.string.failed, Toast.LENGTH_SHORT).show()
-                );
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                GalleryActivity.this.runOnUiThread(
+                        () -> Toast.makeText(GalleryActivity.this, R.string.failed, Toast.LENGTH_SHORT).show());
             }
 
             @Override
-            public void onResponse(@NonNull Call call,@NonNull Response response) throws IOException {
-                File file=new File(Global.TORRENTFOLDER,gallery.getId()+".torrent");
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                File file = new File(Global.TORRENTFOLDER, gallery.getId() + ".torrent");
                 Utility.writeStreamToFile(response.body().byteStream(), file);
-                Intent intent=new Intent(Intent.ACTION_VIEW);
+                Intent intent = new Intent(Intent.ACTION_VIEW);
                 Uri torrentUri;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    torrentUri = FileProvider.getUriForFile(GalleryActivity.this, GalleryActivity.this.getPackageName() + ".provider", file);
+                    torrentUri = FileProvider.getUriForFile(GalleryActivity.this,
+                            GalleryActivity.this.getPackageName() + ".provider", file);
                     intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                }else{
-                    torrentUri=Uri.fromFile(file);
+                } else {
+                    torrentUri = Uri.fromFile(file);
                 }
                 intent.setDataAndType(torrentUri, "application/x-bittorrent");
                 try {
                     GalleryActivity.this.startActivity(intent);
-                }catch (RuntimeException ignore){
-                    runOnUiThread(() ->
-                        Toast.makeText(GalleryActivity.this, R.string.failed, Toast.LENGTH_SHORT).show()
-                    );
+                } catch (RuntimeException ignore) {
+                    runOnUiThread(
+                            () -> Toast.makeText(GalleryActivity.this, R.string.failed, Toast.LENGTH_SHORT).show());
 
                 }
                 file.deleteOnExit();
             }
-        }).setMethod("GET",null).start();
+        }).setMethod("GET", null).start();
     }
 
     private void updateStatus() {
         List<String> statuses = StatusManager.getNames();
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         statusString = Queries.StatusMangaTable.getStatus(gallery.getId()).name;
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice, statuses) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice,
+                statuses) {
             @NonNull
             @Override
             public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -358,13 +374,16 @@ public class GalleryActivity extends BaseActivity {
                 return textView;
             }
         };
-        builder.setSingleChoiceItems(adapter, statuses.indexOf(statusString), (dialog, which) -> statusString = statuses.get(which));
+        builder.setSingleChoiceItems(adapter, statuses.indexOf(statusString),
+                (dialog, which) -> statusString = statuses.get(which));
         builder
-            .setNeutralButton(R.string.add, (dialog, which) -> createNewStatusDialog())
-            .setNegativeButton(R.string.remove_status, (dialog, which) -> Queries.StatusMangaTable.remove(gallery.getId()))
-            .setPositiveButton(R.string.ok, (dialog, which) -> Queries.StatusMangaTable.insert(gallery, statusString))
-            .setTitle(R.string.change_status_title)
-            .show();
+                .setNeutralButton(R.string.add, (dialog, which) -> createNewStatusDialog())
+                .setNegativeButton(R.string.remove_status,
+                        (dialog, which) -> Queries.StatusMangaTable.remove(gallery.getId()))
+                .setPositiveButton(R.string.ok,
+                        (dialog, which) -> Queries.StatusMangaTable.insert(gallery, statusString))
+                .setTitle(R.string.change_status_title)
+                .show();
     }
 
     private void createNewStatusDialog() {
@@ -376,21 +395,23 @@ public class GalleryActivity extends BaseActivity {
             newStatusColor = Utility.RANDOM.nextInt() | 0xff000000;
         } while (newStatusColor == Color.BLACK || newStatusColor == Color.WHITE);
         btnColor.setBackgroundColor(newStatusColor);
-        btnColor.setOnClickListener(v -> new AmbilWarnaDialog(GalleryActivity.this, newStatusColor, false, new AmbilWarnaDialog.OnAmbilWarnaListener() {
-            @Override
-            public void onCancel(AmbilWarnaDialog dialog) {
-            }
+        btnColor.setOnClickListener(v -> new AmbilWarnaDialog(GalleryActivity.this, newStatusColor, false,
+                new AmbilWarnaDialog.OnAmbilWarnaListener() {
+                    @Override
+                    public void onCancel(AmbilWarnaDialog dialog) {
+                    }
 
-            @Override
-            public void onOk(AmbilWarnaDialog dialog, int color) {
-                if (color == Color.WHITE || color == Color.BLACK) {
-                    Toast.makeText(GalleryActivity.this, R.string.invalid_color_selected, Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                newStatusColor = color;
-                btnColor.setBackgroundColor(color);
-            }
-        }).show());
+                    @Override
+                    public void onOk(AmbilWarnaDialog dialog, int color) {
+                        if (color == Color.WHITE || color == Color.BLACK) {
+                            Toast.makeText(GalleryActivity.this, R.string.invalid_color_selected, Toast.LENGTH_SHORT)
+                                    .show();
+                            return;
+                        }
+                        newStatusColor = color;
+                        btnColor.setBackgroundColor(color);
+                    }
+                }).show());
         builder.setView(layout);
         builder.setTitle(R.string.create_new_status);
         builder.setPositiveButton(R.string.ok, (dialog, which) -> {
@@ -414,14 +435,16 @@ public class GalleryActivity extends BaseActivity {
     private void updateIcon(boolean nowIsFavorite) {
         GalleryActivity.this.runOnUiThread(() -> {
             onlineFavoriteItem.setIcon(!nowIsFavorite ? R.drawable.ic_star_border : R.drawable.ic_star);
-            onlineFavoriteItem.setTitle(!nowIsFavorite ? R.string.add_to_online_favorite : R.string.remove_from_online_favorites);
+            onlineFavoriteItem
+                    .setTitle(!nowIsFavorite ? R.string.add_to_online_favorite : R.string.remove_from_online_favorites);
         });
     }
 
     private void addToFavorite(final MenuItem item) {
 
         boolean wasFavorite = onlineFavoriteItem.getTitle().equals(getString(R.string.remove_from_online_favorites));
-        String url = String.format(Locale.US, Utility.getBaseUrl() + "api/gallery/%d/%sfavorite", gallery.getId(), wasFavorite ? "un" : "");
+        String url = String.format(Locale.US, Utility.getBaseUrl() + "api/gallery/%d/%sfavorite", gallery.getId(),
+                wasFavorite ? "un" : "");
         String galleryUrl = String.format(Locale.US, Utility.getBaseUrl() + "g/%d/", gallery.getId());
         LogUtility.d("Calling: " + url);
         new AuthRequest(galleryUrl, url, new Callback() {
@@ -443,10 +466,12 @@ public class GalleryActivity extends BaseActivity {
     private void updateColumnCount(boolean increase) {
         int x = Global.getColumnCount();
         CustomGridLayoutManager manager = (CustomGridLayoutManager) recycler.getLayoutManager();
-        if (manager == null) return;
+        if (manager == null)
+            return;
         MenuItem item = ((Toolbar) findViewById(R.id.toolbar)).getMenu().findItem(R.id.change_view);
         if (increase || manager.getSpanCount() != x) {
-            if (increase) x = x % 4 + 1;
+            if (increase)
+                x = x % 4 + 1;
             int pos = manager.findFirstVisibleItemPosition();
             Global.updateColumnCount(this, x);
 
@@ -487,7 +512,8 @@ public class GalleryActivity extends BaseActivity {
         InspectorV3.galleryInspector(this, gallery.getId(), new InspectorV3.DefaultInspectorResponse() {
             @Override
             public void onSuccess(List<GenericGallery> galleries) {
-                if (galleries.size() == 0) return;
+                if (galleries.size() == 0)
+                    return;
                 Intent intent = new Intent(GalleryActivity.this, GalleryActivity.class);
                 LogUtility.d(galleries.get(0).toString());
                 intent.putExtra(getPackageName() + ".GALLERY", galleries.get(0));
@@ -498,11 +524,14 @@ public class GalleryActivity extends BaseActivity {
 
     @TargetApi(Build.VERSION_CODES.M)
     private void requestStorage() {
-        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        requestPermissions(
+                new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE },
+                1);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         Global.initStorage(this);
         if (requestCode == 1 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)

@@ -80,9 +80,10 @@ public class SimpleGallery extends GenericGallery {
         a = e.getElementsByTag("img").first();
         temp = a.hasAttr("data-src") ? a.attr("data-src") : a.attr("src");
         mediaId = Integer.parseInt(temp.substring(temp.indexOf("galleries") + 10, temp.lastIndexOf('/')));
-        thumbnail = Page.charToExt(temp.charAt(temp.length() - 3));
+        thumbnail = Page.charToExt(temp.charAt(temp.lastIndexOf('.') + 1));
         title = e.getElementsByTag("div").first().text();
-        if (context != null && id > Global.getMaxId()) Global.updateMaxId(context, id);
+        if (context != null && id > Global.getMaxId())
+            Global.updateMaxId(context, id);
     }
 
     public SimpleGallery(Gallery gallery) {
@@ -93,6 +94,9 @@ public class SimpleGallery extends GenericGallery {
     }
 
     private static String extToString(ImageExt ext) {
+        if (ext == null) {
+            return null;
+        }
         switch (ext) {
             case GIF:
                 return "gif";
@@ -100,6 +104,8 @@ public class SimpleGallery extends GenericGallery {
                 return "png";
             case JPG:
                 return "jpg";
+            case WEBP:
+                return "webp";
         }
         return null;
     }
@@ -109,7 +115,8 @@ public class SimpleGallery extends GenericGallery {
     }
 
     public boolean hasIgnoredTags(String s) {
-        if (tags == null) return false;
+        if (tags == null)
+            return false;
         for (Tag t : tags.getAllTagsList())
             if (s.contains(t.toQueryTag(TagStatus.AVOIDED))) {
                 LogUtility.d("Found: " + s + ",," + t.toQueryTag());
@@ -166,14 +173,16 @@ public class SimpleGallery extends GenericGallery {
         dest.writeInt(mediaId);
         dest.writeByte((byte) thumbnail.ordinal());
         dest.writeByte((byte) language.ordinal());
-        //TAGS AREN'T WRITTEN
+        // TAGS AREN'T WRITTEN
     }
 
     public Uri getThumbnail() {
         if (thumbnail == ImageExt.GIF) {
-            return Uri.parse(String.format(Locale.US, "https://i." + Utility.getHost() + "/galleries/%d/1.gif", mediaId));
+            return Uri
+                    .parse(String.format(Locale.US, "https://i." + Utility.getHost() + "/galleries/%d/1.gif", mediaId));
         }
-        return Uri.parse(String.format(Locale.US, "https://t." + Utility.getHost() + "/galleries/%d/thumb.%s", mediaId, extToString(thumbnail)));
+        return Uri.parse(String.format(Locale.US, "https://t3." + Utility.getHost() + "/galleries/%d/thumb.%s", mediaId,
+                extToString(thumbnail)));
     }
 
     public int getMediaId() {
@@ -192,12 +201,12 @@ public class SimpleGallery extends GenericGallery {
     @Override
     public String toString() {
         return "SimpleGallery{" +
-            "language=" + language +
-            ", title='" + title + '\'' +
-            ", thumbnail=" + thumbnail +
-            ", id=" + id +
-            ", mediaId=" + mediaId +
-            '}';
+                "language=" + language +
+                ", title='" + title + '\'' +
+                ", thumbnail=" + thumbnail +
+                ", id=" + id +
+                ", mediaId=" + mediaId +
+                '}';
     }
 
     @Override

@@ -64,7 +64,8 @@ public class Gallery extends GenericGallery {
         LogUtility.d("Found JSON: " + json);
         JsonReader reader = new JsonReader(new StringReader(json));
         this.related = new ArrayList<>(related.size());
-        for (Element e : related) this.related.add(new SimpleGallery(context, e));
+        for (Element e : related)
+            this.related.add(new SimpleGallery(context, e));
         galleryData = new GalleryData(reader);
         folder = GalleryFolder.fromId(context, galleryData.getId());
         calculateSizes(galleryData);
@@ -101,7 +102,8 @@ public class Gallery extends GenericGallery {
     }
 
     public static String getPathTitle(@Nullable String title, @NonNull String defaultValue) {
-        if (title == null) return defaultValue;
+        if (title == null)
+            return defaultValue;
         String pathTitle = title.replace('/', ' ').replaceAll("[/|\\\\*\"'?:<>]", " ");
         while (pathTitle.contains("  "))
             pathTitle = pathTitle.replace("  ", " ");
@@ -134,10 +136,12 @@ public class Gallery extends GenericGallery {
         Size actualSize;
         for (Page page : galleryData.getPages()) {
             actualSize = page.getSize();
-            if (actualSize.getWidth() > maxSize.getWidth()) maxSize.setWidth(actualSize.getWidth());
+            if (actualSize.getWidth() > maxSize.getWidth())
+                maxSize.setWidth(actualSize.getWidth());
             if (actualSize.getHeight() > maxSize.getHeight())
                 maxSize.setHeight(actualSize.getHeight());
-            if (actualSize.getWidth() < minSize.getWidth()) minSize.setWidth(actualSize.getWidth());
+            if (actualSize.getWidth() < minSize.getWidth())
+                minSize.setWidth(actualSize.getWidth());
             if (actualSize.getHeight() < minSize.getHeight())
                 minSize.setHeight(actualSize.getHeight());
         }
@@ -153,9 +157,12 @@ public class Gallery extends GenericGallery {
     }
 
     public Uri getCover() {
-        if (Global.getDownloadPolicy() == Global.DataUsageType.THUMBNAIL) return getThumbnail();
-        if (galleryData.getCover().getImageExt() == ImageExt.GIF) return getHighPage(0);
-        return Uri.parse(String.format(Locale.US, "https://t." + Utility.getHost() + "/galleries/%d/cover.%s", getMediaId(), galleryData.getCover().extToString()));
+        if (Global.getDownloadPolicy() == Global.DataUsageType.THUMBNAIL)
+            return getThumbnail();
+        if (galleryData.getCover().getImageExt() == ImageExt.GIF)
+            return getHighPage(0);
+        return Uri.parse(String.format(Locale.US, "https://t3." + Utility.getHost() + "/galleries/%d/cover.%s",
+                getMediaId(), galleryData.getCover().extToString()));
     }
 
     public ImageExt getThumb() {
@@ -163,33 +170,41 @@ public class Gallery extends GenericGallery {
     }
 
     public Uri getThumbnail() {
-        if (galleryData.getCover().getImageExt() == ImageExt.GIF) return getHighPage(0);
-        return Uri.parse(String.format(Locale.US, "https://t." + Utility.getHost() + "/galleries/%d/thumb.%s", getMediaId(), galleryData.getThumbnail().extToString()));
+        if (galleryData.getCover().getImageExt() == ImageExt.GIF)
+            return getHighPage(0);
+        return Uri.parse(String.format(Locale.US, "https://t3." + Utility.getHost() + "/galleries/%d/thumb.%s",
+                getMediaId(), galleryData.getThumbnail().extToString()));
     }
 
-    private @Nullable
-    Uri getFileUri(int page) {
-        if (folder == null) return null;
+    private @Nullable Uri getFileUri(int page) {
+        if (folder == null)
+            return null;
         PageFile f = folder.getPage(page + 1);
-        if (f == null) return null;
+        if (f == null)
+            return null;
         return f.toUri();
     }
 
     public Uri getPageUrl(int page) {
-        if (Global.getDownloadPolicy() == Global.DataUsageType.THUMBNAIL) return getLowPage(page);
+        if (Global.getDownloadPolicy() == Global.DataUsageType.THUMBNAIL)
+            return getLowPage(page);
         Uri uri = getFileUri(page);
-        if (uri != null) return uri;
+        if (uri != null)
+            return uri;
         return getHighPage(page);
     }
 
     public Uri getHighPage(int page) {
-        return Uri.parse(String.format(Locale.US, "https://i." + Utility.getHost() + "/galleries/%d/%d.%s", getMediaId(), page + 1, getPageExtension(page)));
+        return Uri.parse(String.format(Locale.US, "https://i." + Utility.getHost() + "/galleries/%d/%d.%s",
+                getMediaId(), page + 1, getPageExtension(page)));
     }
 
     public Uri getLowPage(int page) {
         Uri uri = getFileUri(page);
-        if (uri != null) return uri;
-        return Uri.parse(String.format(Locale.US, "https://t." + Utility.getHost() + "/galleries/%d/%dt.%s", getMediaId(), page + 1, getPageExtension(page)));
+        if (uri != null)
+            return uri;
+        return Uri.parse(String.format(Locale.US, "https://t3." + Utility.getHost() + "/galleries/%d/%dt.%s",
+                getMediaId(), page + 1, getPageExtension(page)));
     }
 
     public String getPageExtension(int page) {
@@ -236,10 +251,14 @@ public class Gallery extends GenericGallery {
     @Override
     public String getTitle() {
         String x = getTitle(Global.getTitleType());
-        if (x.length() > 2) return x;
-        if ((x = getTitle(TitleType.PRETTY)).length() > 2) return x;
-        if ((x = getTitle(TitleType.ENGLISH)).length() > 2) return x;
-        if ((x = getTitle(TitleType.JAPANESE)).length() > 2) return x;
+        if (x.length() > 2)
+            return x;
+        if ((x = getTitle(TitleType.PRETTY)).length() > 2)
+            return x;
+        if ((x = getTitle(TitleType.ENGLISH)).length() > 2)
+            return x;
+        if ((x = getTitle(TitleType.JAPANESE)).length() > 2)
+            return x;
         return "Unnamed";
     }
 
@@ -310,7 +329,7 @@ public class Gallery extends GenericGallery {
     }
 
     public void jsonWrite(Writer ww) throws IOException {
-        //images aren't saved
+        // images aren't saved
         JsonWriter writer = new JsonWriter(ww);
         writer.beginObject();
         writer.name("id").value(getId());
@@ -364,11 +383,11 @@ public class Gallery extends GenericGallery {
     @Override
     public String toString() {
         return "Gallery{" +
-            "galleryData=" + galleryData +
-            ", language=" + language +
-            ", maxSize=" + maxSize +
-            ", minSize=" + minSize +
-            ", onlineFavorite=" + onlineFavorite +
-            '}';
+                "galleryData=" + galleryData +
+                ", language=" + language +
+                ", maxSize=" + maxSize +
+                ", minSize=" + minSize +
+                ", onlineFavorite=" + onlineFavorite +
+                '}';
     }
 }

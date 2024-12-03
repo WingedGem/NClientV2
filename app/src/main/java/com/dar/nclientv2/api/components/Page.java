@@ -83,6 +83,9 @@ public class Page implements Parcelable {
     }
 
     public static String extToString(ImageExt ext) {
+        if (ext == null) {
+            return null;
+        }
         switch (ext) {
             case GIF:
                 return "gif";
@@ -90,11 +93,16 @@ public class Page implements Parcelable {
                 return "png";
             case JPG:
                 return "jpg";
+            case WEBP:
+                return "webp";
         }
         return null;
     }
 
     public static char extToChar(ImageExt imageExt) {
+        if (imageExt == null) {
+            return '\0';
+        }
         switch (imageExt) {
             case GIF:
                 return 'g';
@@ -102,6 +110,8 @@ public class Page implements Parcelable {
                 return 'p';
             case JPG:
                 return 'j';
+            case WEBP:
+                return 'w';
         }
         return '\0';
     }
@@ -114,6 +124,8 @@ public class Page implements Parcelable {
                 return ImageExt.PNG;
             case 'j':
                 return ImageExt.JPG;
+            case 'w':
+                return ImageExt.WEBP;
         }
         return null;
     }
@@ -158,10 +170,10 @@ public class Page implements Parcelable {
     @Override
     public String toString() {
         return "Page{" +
-            "page=" + page +
-            ", imageExt=" + imageExt +
-            ", imageType=" + imageType +
-            ", size=" + size +
-            '}';
+                "page=" + page +
+                ", imageExt=" + imageExt +
+                ", imageType=" + imageType +
+                ", size=" + size +
+                '}';
     }
 }
